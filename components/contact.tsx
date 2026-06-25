@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, Send, CheckCircle2 } from 'lucide-react'
+import { Mail, Phone, Send, CheckCircle2, AlertCircle } from 'lucide-react'
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -12,17 +12,54 @@ export function Contact() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  // Client-side validation
+  const validateForm = (): boolean => {
+    setError('')
+
+    if (formData.name.trim().length < 2 || formData.name.trim().length > 100) {
+      setError('Name must be between 2 and 100 characters')
+      return false
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address')
+      return false
+    }
+
+    if (formData.subject.trim().length < 3 || formData.subject.trim().length > 200) {
+      setError('Subject must be between 3 and 200 characters')
+      return false
+    }
+
+    if (formData.message.trim().length < 10 || formData.message.trim().length > 5000) {
+      setError('Message must be between 10 and 5000 characters')
+      return false
+    }
+
+    return true
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
+    setError('')
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // Validate before submitting
+    if (!validateForm()) {
+      return
+    }
+
     setLoading(true)
+    setError('')
 
     try {
       const response = await fetch('/api/contacts', {
@@ -36,10 +73,11 @@ export function Contact() {
         setFormData({ name: '', email: '', subject: '', message: '' })
         setTimeout(() => setSubmitted(false), 3000)
       } else {
-        console.error('Failed to send message')
+        const data = await response.json()
+        setError(data.error || 'Failed to send message')
       }
-    } catch (error) {
-      console.error('Error sending message:', error)
+    } catch (err) {
+      setError('An error occurred. Please try again later.')
     } finally {
       setLoading(false)
     }
@@ -102,6 +140,12 @@ export function Contact() {
 
           {/* Contact Form */}
           <div className="bg-card rounded-lg p-6 border border-border hover:border-primary/30 transition-all animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
+                <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <span className="text-red-500 text-sm">{error}</span>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Name</label>
