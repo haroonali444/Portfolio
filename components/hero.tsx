@@ -2,8 +2,59 @@
 
 import { ArrowDown } from 'lucide-react'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 export function Hero() {
+  const [displayedTitle, setDisplayedTitle] = useState('')
+  const [displayedTagline, setDisplayedTagline] = useState('')
+  const [displayedDescription, setDisplayedDescription] = useState('')
+  const [animationComplete, setAnimationComplete] = useState(false)
+
+  const title = 'Haroon Ali'
+  const tagline = 'Certified Ethical Hacker (CEH v13) | Software Engineer'
+  const description = 'Security Testing • CI/CD | ML Technical Debt Researcher | Penetration Tester • Malware Analysis • Firewall Security | Website Testing & Vulnerability Assessment'
+
+  useEffect(() => {
+    let charIndex = 0
+    let currentPhase = 0 // 0: title, 1: tagline, 2: description
+
+    const typeChar = () => {
+      if (currentPhase === 0) {
+        if (charIndex <= title.length) {
+          setDisplayedTitle(title.slice(0, charIndex))
+          charIndex++
+        } else {
+          currentPhase = 1
+          charIndex = 0
+          setTimeout(typeChar, 800) // Delay before next line
+          return
+        }
+      } else if (currentPhase === 1) {
+        if (charIndex <= tagline.length) {
+          setDisplayedTagline(tagline.slice(0, charIndex))
+          charIndex++
+        } else {
+          currentPhase = 2
+          charIndex = 0
+          setTimeout(typeChar, 800) // Delay before next line
+          return
+        }
+      } else if (currentPhase === 2) {
+        if (charIndex <= description.length) {
+          setDisplayedDescription(description.slice(0, charIndex))
+          charIndex++
+        } else {
+          setAnimationComplete(true)
+          return
+        }
+      }
+
+      setTimeout(typeChar, 50) // Typing speed
+    }
+
+    typeChar()
+  }, [])
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
     element?.scrollIntoView({ behavior: 'smooth' })
@@ -30,16 +81,19 @@ export function Hero() {
           </div>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-4 leading-tight">
-          Haroon Ali
+        <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-4 leading-tight min-h-[80px]">
+          {displayedTitle}
+          {!animationComplete && displayedTitle.length < title.length && <span className="animate-pulse">|</span>}
         </h1>
         
-        <p className="text-xl md:text-2xl text-primary font-semibold mb-2">
-          Certified Ethical Hacker (CEH v13) | Software Engineer
+        <p className="text-xl md:text-2xl text-primary font-semibold mb-2 min-h-[32px]">
+          {displayedTagline}
+          {displayedTitle === title && displayedTagline.length < tagline.length && !animationComplete && <span className="animate-pulse">|</span>}
         </p>
 
-        <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-          Security Testing • CI/CD | ML Technical Debt Researcher | Penetration Tester • Malware Analysis • Firewall Security | Website Testing & Vulnerability Assessment
+        <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed min-h-[80px]">
+          {displayedDescription}
+          {displayedTagline === tagline && displayedDescription.length < description.length && !animationComplete && <span className="animate-pulse">|</span>}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
