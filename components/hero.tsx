@@ -26,8 +26,6 @@ export function Hero() {
         } else {
           currentPhase = 1
           charIndex = 0
-          setTimeout(typeChar, 800) // Delay before next line
-          return
         }
       } else if (currentPhase === 1) {
         if (charIndex <= tagline.length) {
@@ -36,8 +34,6 @@ export function Hero() {
         } else {
           currentPhase = 2
           charIndex = 0
-          setTimeout(typeChar, 800) // Delay before next line
-          return
         }
       } else if (currentPhase === 2) {
         if (charIndex <= description.length) {
